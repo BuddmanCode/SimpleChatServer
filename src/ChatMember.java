@@ -1,10 +1,10 @@
 import java.io.IOException;
 import java.util.Objects;
-public class ChatMember implements Runnable, Comparable<ChatMember> {
+public class ChatMember implements Runnable, Comparable<ChatMember> { //знает, как связаться с участником чата
     private final String name;
-    private Connection connection;
-    private ChatServer server;
-    private int hashCode;
+    private final Connection connection;
+    private final ChatServer server;
+    private final int hashCode;
     boolean repeat = true;
     public ChatMember(String name, Connection connection, ChatServer server) {
         this.name = name;
@@ -17,7 +17,7 @@ public class ChatMember implements Runnable, Comparable<ChatMember> {
         repeat = false;
         connection.close();
     }
-    public void send(String message) {
+    public void send(String message) { //передаём сообщение через соединение
         try {
             connection.sendString(message);
         } catch (Exception e) {
@@ -30,7 +30,7 @@ public class ChatMember implements Runnable, Comparable<ChatMember> {
     public void run() {
         while(repeat) {
             try {
-                server.processMessage(this, connection.getString());
+                server.processMessage(this, connection.getString()); //ожидаем новой строки от клиента
             } catch (Exception e) {
                 server.removeMember(this);
                 //e.printStackTrace();

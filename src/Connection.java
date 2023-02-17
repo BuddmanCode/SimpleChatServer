@@ -1,43 +1,24 @@
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.PrintStream;
 import java.net.Socket;
-import java.util.ArrayDeque;
 import java.util.Scanner;
 
-public class Connection implements Runnable{
-    private Socket socket;
-    private ChatServer server;
-    private InputStream is;
-    private OutputStream os;
-    private Scanner in;
-    private PrintStream out;
+public class Connection implements Runnable{ //взаимодействует с клиентом, передаёт серверу потенциальных участников чата
+    private final Socket socket;
+    private final ChatServer server;
+    private final Scanner in;
+    private final PrintStream out;
     public Connection(ChatServer server, Socket socket) throws IOException {
         this.socket = socket;
         this.server = server;
-        try {
-            is = socket.getInputStream();
-            os = socket.getOutputStream();
-            in = new Scanner(is);
-            out = new PrintStream(os);
-        } catch (IOException e) {
-            throw e;
-        }
+        in = new Scanner(socket.getInputStream());
+        out = new PrintStream(socket.getOutputStream());
     }
     public void sendString(String message) throws Exception {
-        try {
-            out.println(message);
-        } catch (Exception e) {
-            throw e;
-        }
+        out.println(message);
     }
     public String getString() throws Exception {
-        try {
-            return in.nextLine();
-        } catch (Exception e) {
-            throw e;
-        }
+        return in.nextLine();
     }
     @Override
     public void run() {
@@ -45,13 +26,14 @@ public class Connection implements Runnable{
         boolean repeat = true;
         try {
             sendString("Server: Привет новый друг! Как теба зовут?");
-            while (repeat) {
+            while (repeat) { //Выбор свободного имени
                 try {
                     name = getString();
-                    if (name != null) {
+                    if (name != null) { //если ничего не отвалилось
+                        //создаём экземпляр участника чата и пробуем зарегистрировать
                         if (!name.equals("Server") && !name.equals("") && server.registerMember(new ChatMember(name, this, server))) {
                             repeat = false;
-                            sendString(new StringBuilder("Добро пожаловать, ").append(name).append("!\nДля выхода напечатай :leave").toString());;
+                            sendString(new StringBuilder("Добро пожаловать, ").append(name).append("!\nДля выхода напечатай :leave").toString());
                         } else
                             sendString("Server: Это имя уже занято. Попробуй другое.");
                     } else {
