@@ -72,9 +72,9 @@ public class ChatServer implements Runnable{ //распределяет сооб
         ChatServer srv = new ChatServer(1234);
         Thread thread = new Thread(srv);
         thread.start(); //Создаём экземпляр сервера в отдельном потоке
-        while(true) {
+        /*while(true) {
             break; //Здесь потом возможно добавлю меню сервера
-        }
+        }*/
     }
     @Override
     public void run() {
